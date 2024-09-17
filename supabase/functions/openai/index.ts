@@ -1,5 +1,5 @@
-import { Laminar as L } from 'npm:@lmnr-ai/lmnr@0.4.8'
-import OpenAI from 'npm:openai'
+import { Laminar as L, observe } from '@lmnr-ai/lmnr'
+import OpenAI from 'openai'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const ai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY') })
@@ -20,19 +20,22 @@ Deno.serve(async req => {
 		})
 
 		const { query } = await req.json().catch(() => ({ query: null }))
-		const message = query || 'How many times does the letter "r" appear in the word "strawberry"?'
 
-		L.event('chat_started', message)
-		const response = await ai.chat.completions.create({
-			model: 'chatgpt-4o-latest',
-			messages: [{ role: 'user', content: message }]
+		const message = query || 'How many times does the letter "r" appear in the word "strawberry"?'
+		const res = await observe({ name: req.url }, async () => {
+			L.event('chat_started', message)
+			const response = await ai.chat.completions.create({
+				model: 'chatgpt-4o-latest',
+				messages: [{ role: 'user', content: message }]
+			})
+
+			const text = response.choices[0].message.content
+			if (text) L.event('chat_completed', text)
+			else L.event('chat_errored', response.id)
+			return text
 		})
 
-		const text = response.choices[0].message.content
-		if (text) L.event('chat_completed', text)
-		else L.event('chat_errored', response.id)
-
-		return new Response(text, {
+		return new Response(res, {
 			headers: {
 				...corsHeaders,
 				'Content-Type': 'text/plain'
