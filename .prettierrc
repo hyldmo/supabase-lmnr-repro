@@ -16,6 +16,3 @@ overrides:
       useTabs: false
       tabWidth: 2
       printWidth: 200
-
-plugins:
-  - 'prettier-plugin-tailwindcss'
