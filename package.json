@@ -1,0 +1,21 @@
+{
+	"name": "supabase-lmnr-repro",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"dev": "supabase start && npm run generate-env && concurrently -c 'magenta,green'  --kill-others-on-fail 'npm:*:dev'",
+		"app:dev": "cd app && npm run start",
+		"supabase:start": "supabase start",
+		"functions:dev": "supabase functions serve",
+		"generate-env": "npx supabase status | awk '/API URL:/ {api_url=$3} /anon key:/ {anon_key=$3} END {print \"REACT_APP_SUPABASE_URL=\\\"\" api_url \"\\\"\" > \".env\"; print \"REACT_APP_SUPABASE_ANON_KEY=\\\"\" anon_key \"\\\"\" >> \".env\"}'"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"concurrently": "^9.0.1",
+		"supabase": "^1.192.5"
+	},
+	"workspaces": [
+		"app"
+	]
+}

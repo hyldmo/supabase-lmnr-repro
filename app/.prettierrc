@@ -1,0 +1,21 @@
+useTabs: true
+tabWidth: 4
+printWidth: 120
+bracketSameLine: false
+proseWrap: always
+
+semi: false
+singleQuote: true
+trailingComma: none
+quoteProps: preserve
+arrowParens: avoid
+
+overrides:
+  - files: ['package.json', '*.yml', '*.yaml', '.prettierrc']
+    options:
+      useTabs: false
+      tabWidth: 2
+      printWidth: 200
+
+plugins:
+  - 'prettier-plugin-tailwindcss'
