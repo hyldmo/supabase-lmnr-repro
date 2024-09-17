@@ -1,10 +1,11 @@
+import 'jsr:@std/dotenv/load'
 import { Laminar as L, observe } from '@lmnr-ai/lmnr'
 import OpenAI from 'openai'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const ai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY') })
 
-Deno.serve(async req => {
+const handler: Deno.ServeHandler = async req => {
 	if (req.method === 'OPTIONS') {
 		return new Response(null, {
 			status: 204,
@@ -50,4 +51,11 @@ Deno.serve(async req => {
 			}
 		})
 	}
-})
+}
+
+// Detect if we're running inside Supabase
+if (Deno.env.get('SUPABASE_DB_URL')) {
+	Deno.serve(handler)
+} else {
+	Deno.serve({ port: 3333, hostname: '127.0.0.1' }, handler)
+}
